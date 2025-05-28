@@ -584,7 +584,6 @@ gg_miss_fct(PROMKA |> dplyr::select(contains("Score"), TimePoint), TimePoint) +
   )
 ```
 
-
 ```{r}
 #| label: fig-tfi-miss
 #| fig-cap: "Missingness of IKDC2000 Score by Timepoint in the Tibiofemoral Instability cohort"
@@ -959,7 +958,6 @@ knitr::knit_print(FigModemP3)
 
 ## Knee Arthritis
 
-
 ```{r}
 #| label: tbl-ka-demographics
 #| tbl-cap: "Summary of demographics in Knee Arthritis cohort"
@@ -986,8 +984,6 @@ TableKAdemo <- gtsummary::tbl_summary(
 
 knitr::knit_print(TableKAdemo)
 ```
-
-
 
 ```{r}
 #| label: fig-koosjr-ka
@@ -1178,8 +1174,6 @@ FigIKDCSym7 <- ggplot(PROMTFI |> dplyr::filter(
   knitr::knit_print(FigIKDCSym7)
 ```
 
-
-
 ```{r}
 #| label: fig-ikdcsym7prim
 #| fig-cap: "IKDC Symptom Q7 - highest level of activity performed in which episodes of giving way are experienced in Tibiofemoral Instability cohort - primary surgical cases"
@@ -1212,7 +1206,6 @@ FigIKDCSym7 <- ggplot(PROMTFI |> dplyr::filter(
   
   knitr::knit_print(FigIKDCSym7)
 ```
-
 
 ```{r}
 #| label: fig-aclris
@@ -1259,9 +1252,6 @@ TablerTKAdemo <- gtsummary::tbl_summary(
 knitr::knit_print(TablerTKAdemo)
 ```
 
-
-
-
 ```{r}
 SnapshotrTKA <- Snapshot |> dplyr::filter(
   RegistryCohortName == "ReinterventionArthroplasty"
@@ -1274,7 +1264,6 @@ SnapshotrTKA <- Snapshot |> dplyr::filter(
 )
 ```
 
-
 ```{r}
 #| label: fig-csi
 #| fig-cap: "Central sensitisation index - Reintervention TKA"
@@ -1286,7 +1275,6 @@ FigureCSI <- SnapshotrTKA |> dplyr::filter(
 
 knitr::knit_print(FigureCSI)
 ```
-
 
 ```{r}
 PROMrTKA <- SnapshotrTKA |> dplyr::select(
@@ -1314,13 +1302,11 @@ PROMrTKA <- SnapshotrTKA |> dplyr::select(
 )
 ```
 
-
-
 ```{r}
 #| label: fig-koos12-rtka
 #| fig-cap: "Summary of KOOSJR by Timepoint"
 
-preop_position <- which(levels(PROMrKA$TimePoint) == "Preop")
+preop_position <- which(levels(PROMrTKA$TimePoint) == "Preop")
 
 FigureKOOS12_overlay <- PROMrTKA |> dplyr::filter(
   !(is.na(SurgicalTreatment2))
@@ -1364,6 +1350,7 @@ FigureKOOS12_overlay <- PROMrTKA |> dplyr::filter(
 
 knitr::knit_print(FigureKOOS12_overlay)
 ```
+
 ```{r}
 PROMSat <-  SnapshotrTKA |> dplyr::select(
   starts_with("Satisfaction"),
@@ -1402,12 +1389,11 @@ PROMSat1 <- PROMSat |> dplyr::select(
 )
 ```
 
-
 ```{r}
 #| label: fig-symptomsat
 #| fig-cap: "Symptom satisfaction at 12month followup for Reintervention TKA"
 
-FigModemP1 <- ggplot(PROMSat1 |> dplyr::filter(EligibleAt == "Yes", !is.na(SurgicalTreatment2), !is.na(Satisfaction)), 
+FigSat <- ggplot(PROMSat1 |> dplyr::filter(EligibleAt == "Yes", !is.na(SurgicalTreatment2), !is.na(Satisfaction)), 
                      aes(x = SurgicalTreatment2, fill = Satisfaction)) +
   geom_bar(position = "fill") +
   #facet_wrap(~ SurgicalTreatment2, nrow = 2) +
@@ -1429,9 +1415,8 @@ FigModemP1 <- ggplot(PROMSat1 |> dplyr::filter(EligibleAt == "Yes", !is.na(Surgi
 
 
 
-knitr::knit_print(FigModemP1)
+knitr::knit_print(FigSat)
 ```
-
 
 # Interpretation
 
