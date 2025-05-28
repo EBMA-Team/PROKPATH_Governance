@@ -584,10 +584,6 @@ gg_miss_fct(PROMKA |> dplyr::select(contains("Score"), TimePoint), TimePoint) +
   )
 ```
 
-```{r}
-
-
-```
 
 ```{r}
 #| label: fig-tfi-miss
@@ -632,7 +628,9 @@ PROMTFI <- SnapshotTFI |> dplyr::select(
 ) |> left_join(
   SnapshotTFI |> dplyr::select(
     TreatmentID,
-    SurgicalTreatment2
+    SurgicalTreatment2,
+    TreatmentType,
+    TreatmentStatus
   ),
   by = "TreatmentID"
 )
@@ -961,6 +959,36 @@ knitr::knit_print(FigModemP3)
 
 ## Knee Arthritis
 
+
+```{r}
+#| label: tbl-ka-demographics
+#| tbl-cap: "Summary of demographics in Knee Arthritis cohort"
+
+TableKAdemo <- gtsummary::tbl_summary(
+  Snapshot |> dplyr::filter(
+    RegistryCohortName == "KneeArthritis"
+  ) |> dplyr::select(
+    TreatmentType,
+    SurgicalTreatment2,
+    TreatmentStatus,
+    DateInitialExamination,
+    AgeAtInitialExam,
+    Sex,
+    EducationLevel_Preop,
+    DiagnosisCoded
+  ),
+  by = "SurgicalTreatment2",
+  missing = "no",
+  statistic = list(
+    DateInitialExamination ~ "{min} - {max}"
+  )
+)
+
+knitr::knit_print(TableKAdemo)
+```
+
+
+
 ```{r}
 #| label: fig-koosjr-ka
 #| fig-cap: "Summary of KOOSJR by Timepoint"
@@ -1039,13 +1067,41 @@ Assessment of the *KneeArthritis* cohort reveals that some patients enrolled in 
 ## Tibiofemoral Instability
 
 ```{r}
+#| label: tbl-tfi-demographics
+#| tbl-cap: "Summary of demographics in Tibiofemoral Instability cohort"
+
+TableTFIdemo <- gtsummary::tbl_summary(
+  Snapshot |> dplyr::filter(
+    RegistryCohortName == "TFInstability"
+  ) |> dplyr::select(
+    TreatmentType,
+    SurgicalTreatment2,
+    TreatmentStatus,
+    DateInitialExamination,
+    AgeAtInitialExam,
+    Sex,
+    EducationLevel_Preop,
+    DiagnosisCoded
+  ),
+  by = "SurgicalTreatment2",
+  missing = "no",
+  statistic = list(
+    DateInitialExamination ~ "{min} - {max}"
+  )
+)
+
+knitr::knit_print(TableTFIdemo)
+```
+
+```{r}
 #| label: fig-ikdc-tfi
-#| fig-cap: "Summary of IKDC2000 by Timepoint"
+#| fig-cap: "Summary of IKDC2000 by Timepoint for primary presentations"
 
 preop_position <- which(levels(PROMTFI$TimePoint) == "Preop")
 
 FigureIKDC <- PROMTFI |> dplyr::filter(
-  !(is.na(SurgicalTreatment2))
+  !(is.na(SurgicalTreatment2)),
+  TreatmentType == "Primary"
 ) |> ggplot(aes(y = IKDCTotalScore, x = TimePoint, fill = SurgicalTreatment2, color = SurgicalTreatment2)) +
   stat_halfeye(
     alpha = 0.5,  # Transparency for overlap visibility
@@ -1122,6 +1178,42 @@ FigIKDCSym7 <- ggplot(PROMTFI |> dplyr::filter(
   knitr::knit_print(FigIKDCSym7)
 ```
 
+
+
+```{r}
+#| label: fig-ikdcsym7prim
+#| fig-cap: "IKDC Symptom Q7 - highest level of activity performed in which episodes of giving way are experienced in Tibiofemoral Instability cohort - primary surgical cases"
+
+
+FigIKDCSym7 <- ggplot(PROMTFI |> dplyr::filter(
+  !is.na(IKDCSymptomQ7),
+  SurgicalTreatment2 == "Surgical",
+  TreatmentType == "Primary"
+  ), aes(x = TimePoint, fill = IKDCSymptomQ7)) +
+  geom_bar(position = "fill") +
+  # facet_wrap(~ SurgicalTreatment2, nrow = 3) +
+  # Use a color-blind friendly palette (viridis options: "magma", "inferno", "plasma", "viridis", "cividis", "rocket", "mako", "turbo")
+  scale_fill_viridis_d(option = "viridis") +
+  # labs(title = "IKDC Symptom Q7 by Time Point and Surgical Treatment",
+  #      x = "Time Point",
+  #      y = "Proportion",  # Changed from "Count" to "Proportion" since we're using position="fill"
+  #      fill = "Activity Level") +  # Assuming IKDCSymptomQ7 is about activity levels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "bottom",
+    legend.box = "vertical",  # Stack legend items vertically
+    legend.margin = margin(t = 10, r = 0, b = 0, l = 0),
+    legend.key.size = unit(0.8, "cm"),  # Slightly larger legend keys for better visibility
+    legend.text = element_text(size = 9)  # Adjust text size as needed
+  ) +
+  guides(fill = guide_legend(nrow = 5))  # Force legend to use 5 rows (adjust as needed based on number of categories)
+
+  
+  knitr::knit_print(FigIKDCSym7)
+```
+
+
 ```{r}
 #| label: fig-aclris
 #| fig-cap: "ACL return to sport index - short form"
@@ -1137,6 +1229,209 @@ FigureACLRSI <- ACLRSI1 |> ggplot(aes(y = ACLRSISFTotalScore, x = TimePoint, fil
 knitr::knit_print(FigureACLRSI)
 
 ```
+
+## Reintervention TKA
+
+```{r}
+#| label: tbl-rtka-demographics
+#| tbl-cap: "Summary of demographics in Reintervention Arthroplasty cohort"
+
+TablerTKAdemo <- gtsummary::tbl_summary(
+  Snapshot |> dplyr::filter(
+    RegistryCohortName == "ReinterventionArthroplasty"
+  ) |> dplyr::select(
+    TreatmentType,
+    SurgicalTreatment2,
+    TreatmentStatus,
+    DateInitialExamination,
+    AgeAtInitialExam,
+    Sex,
+    EducationLevel_Preop,
+    DiagnosisCoded
+  ),
+  by = "SurgicalTreatment2",
+  missing = "no",
+  statistic = list(
+    DateInitialExamination ~ "{min} - {max}"
+  )
+)
+
+knitr::knit_print(TablerTKAdemo)
+```
+
+
+
+
+```{r}
+SnapshotrTKA <- Snapshot |> dplyr::filter(
+  RegistryCohortName == "ReinterventionArthroplasty"
+  ) |> rename_with(
+  ~gsub("Atx","At_",.x, fixed = TRUE)
+) |> rename_with(
+  ~gsub("KOOS12_Summary_TotalScore","KOOS12TotalScore",.x, fixed = TRUE)
+) |> rename(
+  EligibleAt_Preop = "EligibleAtPreop"
+)
+```
+
+
+```{r}
+#| label: fig-csi
+#| fig-cap: "Central sensitisation index - Reintervention TKA"
+
+FigureCSI <- SnapshotrTKA |> dplyr::filter(
+  !is.na(SurgicalTreatment)
+) |> ggplot(aes(y = SurgicalTreatment, x = CSIA_TotalScore_Preop)) +
+  stat_halfeye()
+
+knitr::knit_print(FigureCSI)
+```
+
+
+```{r}
+PROMrTKA <- SnapshotrTKA |> dplyr::select(
+  TreatmentID,
+  starts_with("KOOS12TotalScore"),
+  starts_with("EligibleAt"),
+  -EligibleAtIntraop
+) |> pivot_longer(
+  cols = !TreatmentID,
+  names_to = c(".value","TimePoint"),
+  names_sep = "_",
+  values_drop_na = TRUE
+) |> mutate(
+  TimePoint = factor(TimePoint, levels = c("Preop","6months","12months","24months"), ordered = TRUE, exclude = NA),
+  across(contains("Score"), ~as.numeric(.))
+) |> dplyr::filter(
+  EligibleAt == "Yes",
+  !is.na(TimePoint)
+) |> left_join(
+  SnapshotrTKA |> dplyr::select(
+    TreatmentID,
+    SurgicalTreatment2
+  ),
+  by = "TreatmentID"
+)
+```
+
+
+
+```{r}
+#| label: fig-koos12-rtka
+#| fig-cap: "Summary of KOOSJR by Timepoint"
+
+preop_position <- which(levels(PROMrKA$TimePoint) == "Preop")
+
+FigureKOOS12_overlay <- PROMrTKA |> dplyr::filter(
+  !(is.na(SurgicalTreatment2))
+) |> ggplot(aes(y = KOOS12TotalScore, x = TimePoint, fill = SurgicalTreatment2, color = SurgicalTreatment2)) +
+  stat_halfeye(
+    alpha = 0.5,  # Transparency for overlap visibility
+    position = "identity",  # Overlay the distributions
+    na.rm = TRUE,
+    scale = 0.9  # Slightly scale down to avoid too much overlap
+  ) +
+  # Add the ellipse annotation
+  ggforce::geom_ellipse(aes(x0 = preop_position, 
+                  y0 = 70, 
+                  a = 0.3, 
+                  b = 5, 
+                  angle = 0),
+             color = "red", 
+             size = 1.2,
+             inherit.aes = FALSE) +
+  annotate("text", 
+           x = preop_position + 0.4, 
+           y = 85,
+           label = "High preop scores",
+           color = "red",
+           fontface = "bold",
+           size = 3.5) +
+  # Add appropriate scale colors
+  scale_fill_manual(values = c("Surgical" = "steelblue", "Non-Surgical" = "darkgray", "Surgery recommended" = "darkred")) +
+  scale_color_manual(values = c("Surgical" = "steelblue4", "Non-Surgical" = "dimgray", "Surgery recommended" = "darkred")) +
+  labs(
+    y = "KOOSJR Total Score",
+    x = "Time Point",
+    fill = "Treatment",
+    color = "Treatment"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    panel.grid.minor = element_blank()
+  )
+
+knitr::knit_print(FigureKOOS12_overlay)
+```
+```{r}
+PROMSat <-  SnapshotrTKA |> dplyr::select(
+  starts_with("Satisfaction"),
+  starts_with("Eligible"),
+  TreatmentID
+)
+
+PROMSat1 <- PROMSat |> dplyr::select(
+  -EligibleAtIntraop
+) |> pivot_longer(
+  cols = !TreatmentID,
+  names_to = c(".value","TimePoint"),
+  names_sep = "_",
+  values_drop_na = TRUE
+) |> mutate(
+  TimePoint = factor(TimePoint, levels = c("6months","12months"), ordered = TRUE, exclude = NA),
+  across(starts_with("Satisfaction"), ~ forcats::fct(
+    .,
+    levels = c(
+    "Very dissatisfied",
+    "Somewhat dissatisfied",
+    "Neutral",
+    "Somewhat satisfied",
+    "Very satisfied"
+  ))
+)
+) |> dplyr::filter(
+  EligibleAt == "Yes",
+  !is.na(TimePoint)
+) |> left_join(
+  Snapshot |> dplyr::select(
+    TreatmentID,
+    SurgicalTreatment2
+  ),
+  by = "TreatmentID"
+)
+```
+
+
+```{r}
+#| label: fig-symptomsat
+#| fig-cap: "Symptom satisfaction at 12month followup for Reintervention TKA"
+
+FigModemP1 <- ggplot(PROMSat1 |> dplyr::filter(EligibleAt == "Yes", !is.na(SurgicalTreatment2), !is.na(Satisfaction)), 
+                     aes(x = SurgicalTreatment2, fill = Satisfaction)) +
+  geom_bar(position = "fill") +
+  #facet_wrap(~ SurgicalTreatment2, nrow = 2) +
+  labs(#title = "",
+       x = "Time Point",
+       y = "Count",
+       fill = "Outcome") +
+  scale_fill_viridis_d(option = "viridis") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "bottom",
+    legend.box = "vertical",  # Stack legend items vertically
+    legend.margin = margin(t = 10, r = 0, b = 0, l = 0),
+    legend.key.size = unit(0.8, "cm"),  # Slightly larger legend keys for better visibility
+    legend.text = element_text(size = 9)  # Adjust text size as needed
+  ) +
+  guides(fill = guide_legend(nrow = 2)) 
+
+
+
+knitr::knit_print(FigModemP1)
+```
+
 
 # Interpretation
 
