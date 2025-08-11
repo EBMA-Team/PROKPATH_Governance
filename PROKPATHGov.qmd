@@ -711,16 +711,15 @@ PROMKA1 <- PROMKA |> left_join(
   TimePoint == "Preop"
   ) |> dplyr::select(
   CreationYear,
-  KOOSJRTotalScore
+  KOOSJRTotalScore,
+  DateTreatmentRecordCreation
 )
 
-gg_miss_fct(PROMKA1, CreationYear) +
-  scale_fill_gradient(
-    low = "steelblue",     # Color for low missingness values
-    high = "darkred",      # Color for high missingness values
-    limits = c(min_percent, max_percent),    # Consistent scale limits
-    name = "% Missing"     # Legend title
-  )
+gg_miss_fct(PROMKA1 |> dplyr::select(CreationYear,KOOSJRTotalScore), CreationYear) + scale_fill_viridis_c(
+    option = "plasma",  # or "inferno", "magma", "cividis"
+    name = "% Missing",
+    limits = c(30, 80)  # Set limits from 0% to 100%
+  ) 
 
 ```
 
@@ -743,17 +742,17 @@ PROMTFI1 <- PROMTFI |> left_join(
   IKDCTotalScore
 ) 
 
-gg_miss_fct(PROMTFI1, CreationYear) +
-  scale_fill_gradient(
-    low = "steelblue",     # Color for low missingness values
-    high = "darkred",      # Color for high missingness values
-    limits = c(min_percent, max_percent),    # Consistent scale limits
-    name = "% Missing"     # Legend title
+gg_miss_fct(PROMTFI1, CreationYear) + scale_fill_viridis_c(
+    option = "plasma",  # or "inferno", "magma", "cividis"
+    name = "% Missing",
+    limits = c(30, 90)  # Set limits from 0% to 100%
   )
 
 ```
 
-The results displayed in @fig-tfi-missbase helped to identify the system issue preventing cohort-specific scores being resent to cases that were transferred from one cohort to another. This has now been rectified and eligible cases have been resent links to complete the required questionnaires.
+The results displayed in @fig-ka-missbase and @fig-tfi-missbase show that there are remaining issues with the capture of baseline data for key cohorts.
+
+We have identified modifications to the cohort identification process that may be increasing the number of patients allocated to the General cohort, that are subsequently moved to the correct cohort after the initial consultation. While this is conceptually correct and minimises the risk of presentations being allocated to the wrong cohort initially, it seems to have created a barrier in retrieving cohort-specific PROMs. It may be that the PROMs pack for the General cohort needs to be amended to reduce the burden (it currently contains the full KOOS), make assumptions about cohort allocation prior to the initial consultation, or hold off sending any PROMs until the initial consultation has occurred.
 
 # Cohort Analysis
 
@@ -1420,4 +1419,18 @@ knitr::knit_print(FigSat)
 
 # Interpretation
 
+-   The results flag issues with the capture of baseline PROMs in the registry
+
+    -   Cohort-specific PROMs are being ignored by patients at baseline
+
+-   Intraoperative data is lacking for key cohorts
+
+-   The registry identifies unique patterns in key patient-reported outcomes such as satisfaction, instability symptoms, pain and function overall.
+
 # Recommendations
+
+-   Amend the enrolment and PROMs capture process at baseline
+
+-   EBMA has developed a comprehensive form for intraoperative capture which is ready to pilot
+
+-   Plan for analyses of the existing data in key cohorts and patient subgroups of interest.
