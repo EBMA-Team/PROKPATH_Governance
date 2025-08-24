@@ -25,11 +25,13 @@ execute:
   message: false
 ---
 
+
 # Preamble
 
 The following analysis is a report on the activity, quality and data contained in the [PROKPATH registry](https://sites.google.com/ebma.com.au/prokpath-registry/home).
 
 Analysis packages were loaded initially into the *R* environment.
+
 
 ```{r, load-pkgs}
 
@@ -75,7 +77,9 @@ pacman::p_load(# Load required packages
   
 ```
 
+
 Access to the PROKPATH datasets was pre-authorised.
+
 
 ```{r}
 #| label: auth2
@@ -92,7 +96,9 @@ googledrive::drive_auth(
   )
 ```
 
+
 A function was generated to retrieve files using the *googledrive* package, to call on later in the analysis for processing data imports.
+
 
 ```{r}
 
@@ -139,7 +145,9 @@ get_specific_snapshot <- function(folder_name, base_folder_id = base_folder_id1)
 }
 ```
 
+
 Data was retrieved from live database tables. Source files were specified and stored as global variables to call on in further functions.
+
 
 ```{r}
 #| label: live-table
@@ -203,7 +211,9 @@ colnames(PatientTable) <- Patient_Col
 
 ```
 
+
 A static registry snapshot was retrieved and formatted based on the fixed date of preparation of the snapshot (31-Jul-2025).
+
 
 ```{r}
 
@@ -258,11 +268,13 @@ STROBEInput <- openxlsx2::wb_to_df(
 
 ```
 
+
 # Context
 
 # Recruitment Flow by Region
 
 Flowcharts as per STROBE [@Vandenbroucke2007] and RECORD [@Benchimol2015] guidelines were generated for each region (shoulder, hip, knee) enrolled into the Registry. Followup was set to eligibility at 12months.
+
 
 ```{r}
 
@@ -389,7 +401,9 @@ knitr::knit_print(STROBEPlot2)
 
 ```
 
+
 Cumulative recruitment over time was plotted from Registry inception to the present.
+
 
 ```{r}
 #| label: fig-progress
@@ -436,9 +450,11 @@ knitr::knit_print(cumulative_plot)
 
 ```
 
+
 # Missingness and Compliance
 
 ## Baseline and Intraoperative
+
 
 ```{r}
 #| label: fig-baseline-miss
@@ -458,11 +474,13 @@ gg_miss_fct(Snapshot |> dplyr::filter(
 
 ```
 
+
 Missingness for baseline PROMs (represented by VR12) and intraoperative data is captured in @fig-baseline-miss. Intraoperative data was captured slightly differently between cohorts in the previous system, so multiple fields have been utilised to illustrate intraoperative capture across cohorts.
 
 Overall, there are variable response rates for baseline scores across cohorts. This may reflect variable engagement during consultant clinics. We have also identified a system issue that is impeding scores from being sent to patients that are being re-categorised from one cohort to another. This is predominantly affecting cases that have limited information on their referral and are subsequently moved from the *General* cohort.
 
 ## Patient-reported Outcomes by TimePoint
+
 
 ```{r}
 min_percent <- 10
@@ -692,9 +710,11 @@ ACLRSI1 <-  ACLRSI |> dplyr::select(
 )
 ```
 
+
 The cumulative results of the Registry illustrate difficulty in engaging patients beyond short term followup.
 
 ## Baseline by Year
+
 
 ```{r}
 #| label: fig-ka-missbase
@@ -750,6 +770,7 @@ gg_miss_fct(PROMTFI1, CreationYear) + scale_fill_viridis_c(
 
 ```
 
+
 The results displayed in @fig-ka-missbase and @fig-tfi-missbase show that there are remaining issues with the capture of baseline data for key cohorts.
 
 We have identified modifications to the cohort identification process that may be increasing the number of patients allocated to the General cohort, that are subsequently moved to the correct cohort after the initial consultation. While this is conceptually correct and minimises the risk of presentations being allocated to the wrong cohort initially, it seems to have created a barrier in retrieving cohort-specific PROMs. It may be that the PROMs pack for the General cohort needs to be amended to reduce the burden (it currently contains the full KOOS), make assumptions about cohort allocation prior to the initial consultation, or hold off sending any PROMs until the initial consultation has occurred.
@@ -757,6 +778,7 @@ We have identified modifications to the cohort identification process that may b
 # Cohort Analysis
 
 The VR12 is a *general* health questionnaire that is presented to *all* patients enrolled in the registry.
+
 
 ```{r}
 #| label: fig-vr12pcs-cohort
@@ -788,7 +810,9 @@ FigureVR12MCS <- Snapshot |> dplyr::filter(RegistryCohortName != "KneeDeformity"
 knitr::knit_print(FigureVR12MCS)
 ```
 
+
 Between-cohort variability is observed for the Physical Component Score of the VR12, but not as pronounced for the Mental Component Score. Most notable is the high variation within all cohorts for both VR12 component scores.
+
 
 ```{r}
 #| label: fig-sane
@@ -955,7 +979,9 @@ FigModemP3 <- ggplot(PROMMODEM1 |> dplyr::filter(!is.na(MODEMPQ3), SurgicalTreat
 knitr::knit_print(FigModemP3)
 ```
 
+
 ## Knee Arthritis
+
 
 ```{r}
 #| label: tbl-ka-demographics
@@ -1057,9 +1083,11 @@ knitr::knit_print(TableKAsurg)
 
 ```
 
+
 Assessment of the *KneeArthritis* cohort reveals that some patients enrolled in the cohort are scoring high on the KOOS JR preoperatively, intraoperative data requires backfilling and that there may be sufficient variation in surgical technique to warrant further investigation (e.g. patellar resurfacing, tourniquet use, soft tissue management).
 
 ## Tibiofemoral Instability
+
 
 ```{r}
 #| label: tbl-tfi-demographics
@@ -1139,7 +1167,9 @@ knitr::knit_print(FigureIKDC)
 
 ```
 
+
 Overall, the *TFInstability* cohort mean IKDC score does not reach the reported patient acceptable symptom state (\~ 80) on average at up to 2 years followup. Considering the missingness patterns in the data, this could be attributed to patients self-selecting into responding to PROMs.
+
 
 ```{r}
 #| label: fig-ikdcsym7
@@ -1222,7 +1252,9 @@ knitr::knit_print(FigureACLRSI)
 
 ```
 
+
 ## Reintervention TKA
+
 
 ```{r}
 #| label: tbl-rtka-demographics
@@ -1417,6 +1449,7 @@ FigSat <- ggplot(PROMSat1 |> dplyr::filter(EligibleAt == "Yes", !is.na(SurgicalT
 knitr::knit_print(FigSat)
 ```
 
+
 # Interpretation
 
 -   The results flag issues with the capture of baseline PROMs in the registry
@@ -1434,3 +1467,4 @@ knitr::knit_print(FigSat)
 -   EBMA has developed a comprehensive form for intraoperative capture which is ready to pilot
 
 -   Plan for analyses of the existing data in key cohorts and patient subgroups of interest.
+
